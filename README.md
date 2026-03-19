@@ -66,8 +66,36 @@ find pub/media/custom_options/ -type f ! -name '.htaccess'
 
 If any files are found (especially `.php`, `.phtml`, or `.phar`), investigate immediately — they may be webshells.
 
+## When to remove this module
+
+This module is an interim hotfix. Remove it once Adobe backports the official patch to production Magento versions (2.4.8-p4 or later). To remove:
+
+```bash
+bin/magento module:disable MarkShust_PolyshellPatch
+bin/magento setup:upgrade
+rm -rf app/code/MarkShust/PolyshellPatch
+bin/magento cache:flush
+```
+
+## Why this module is intentionally minimal
+
+Adobe's [official fix](https://github.com/magento/magento2/commit/796c4ce195cee0814ac92e5a19fc2ecfa79dae69) spans 18 files (+997 lines) across `Magento_Catalog`, `Magento_Quote`, and the framework. It introduces a new `ImageContentProcessor`, a `CartItemValidatorChain` at the Repository layer, an `ImageContentUploaderInterface`, and API-scoped DI configuration.
+
+We intentionally did not replicate that approach because:
+
+- **It modifies core module internals.** The official patch alters constructors, adds dependencies to `CustomOptionProcessor` and `Repository`, and introduces new interfaces — changes that are tightly coupled to specific Magento versions and could conflict with the official patch when it ships.
+- **A minimal allowlist is sufficient to block the exploit.** The vulnerability is that any file extension is accepted. Our two plugins enforce a strict image-only allowlist (`jpg`, `jpeg`, `gif`, `png`) at both the validator and uploader level. This is actually stricter than the official fix, which uses a denylist approach (`NotProtectedExtension`) that rejects known-dangerous extensions.
+- **Lower risk of side effects.** A small, self-contained module with two plugins is easy to audit, test, and remove cleanly — which is exactly what you want from a temporary hotfix.
+
 ## References
 
 - [Sansec: Magento PolyShell](https://sansec.io/research/magento-polyshell)
+- [Adobe official fix (commit)](https://github.com/magento/magento2/commit/796c4ce195cee0814ac92e5a19fc2ecfa79dae69)
 - Adobe Security Bulletin: APSB25-94
 - Patched in Magento 2.4.9-alpha3+ (pre-release only, no production patch available)
+
+## Credits
+
+### M.academy
+
+This module is sponsored by <a href="https://m.academy" target="_blank">M.academy</a>, the simplest way to learn Magento.
