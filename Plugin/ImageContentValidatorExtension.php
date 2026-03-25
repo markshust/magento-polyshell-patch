@@ -7,8 +7,10 @@ namespace MarkShust\PolyshellPatch\Plugin;
 use Magento\Framework\Api\Data\ImageContentInterface;
 use Magento\Framework\Api\ImageContentValidator;
 use Magento\Framework\Exception\InputException;
+use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Framework\Filesystem\Io\File as IoFile;
 use Magento\Framework\Phrase;
+use MarkShust\PolyshellPatch\Utility\Configurations;
 
 /**
  * Validate that the uploaded filename has a safe image extension.
@@ -27,11 +29,19 @@ class ImageContentValidatorExtension
     private IoFile $ioFile;
 
     /**
+     * @var Configurations
+     */
+    private Configurations $configurations;
+
+    /**
      * @param IoFile $ioFile
      */
-    public function __construct(IoFile $ioFile)
-    {
+    public function __construct(
+        IoFile $ioFile,
+        Configurations $configurations
+    ) {
         $this->ioFile = $ioFile;
+        $this->configurations = $configurations;
     }
 
     /**
@@ -40,8 +50,10 @@ class ImageContentValidatorExtension
      * @param ImageContentValidator $subject
      * @param bool $result
      * @param ImageContentInterface $imageContent
+     *
      * @return bool
      * @throws InputException
+     * *@throws NoSuchEntityException
      *
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
      */
@@ -50,6 +62,10 @@ class ImageContentValidatorExtension
         bool $result,
         ImageContentInterface $imageContent
     ): bool {
+        if (!$this->configurations->isModuleEnabled()) {
+            return $result;
+        }
+
         $fileName = $imageContent->getName();
         $pathInfo = $this->ioFile->getPathInfo($fileName);
         $extension = strtolower($pathInfo['extension'] ?? '');
