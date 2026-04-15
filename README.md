@@ -2,6 +2,41 @@
 
 Mitigates the PolyShell vulnerability — an unrestricted file upload in the Magento REST API that allows attackers to upload executable files via cart item custom option file uploads.
 
+---
+
+## !! DEPRECATED — DO NOT USE !!
+
+**This package has been deprecated and abandoned in favor of [`aregowe/magento2-module-polyshell-protection`](https://github.com/aregowe/magento2-module-polyshell-protection).**
+
+That module integrates all of this module's protection and extends it significantly with:
+
+- Polyglot file scanning (detects valid images with embedded PHP)
+- No-extension and double-extension attack detection
+- Multi-pass URL decoding and obfuscation normalization
+- Known attack filename/pattern matching
+- Request path blocking at the FrontController and `pub/get.php` level
+- Controller-level upload blocking for customer attribute and file upload endpoints
+- A kill switch blocking all custom option file uploads via the Webapi File Processor
+
+### Migration
+
+If you currently have this module installed, migrate with:
+
+```bash
+bin/magento module:disable MarkShust_PolyshellPatch
+bin/magento setup:upgrade
+composer require aregowe/magento2-module-polyshell-protection
+bin/magento module:enable Aregowe_PolyShellProtection
+bin/magento setup:upgrade
+bin/magento cache:flush
+```
+
+The replacement package includes a Composer `replace` directive for `markshust/magento2-module-polyshell-patch`, so Composer will handle the transition automatically.
+
+---
+
+> **The following documentation is preserved for reference only.** This module is no longer maintained. If you choose to use it anyway, it will still block the basic exploit, but the replacement module above provides far more comprehensive protection.
+
 ## What this module does
 
 Two plugins enforce an image-only extension allowlist (`jpg`, `jpeg`, `gif`, `png`):
