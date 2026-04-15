@@ -2,11 +2,17 @@
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
     <type name="Magento\Framework\Api\ImageProcessor">
-        <plugin name="markshust_polyshell_restrict_upload_extensions"
-                type="MarkShust\PolyshellPatch\Plugin\ImageProcessorRestrictExtensions"/>
+        <plugin name="markshust_polyshellpatch_restrict_extensions"
+                type="MarkShust\PolyshellPatch\Plugin\ImageProcessorRestrictExtensions"
+                sortOrder="10"/>
     </type>
+
     <type name="Magento\Framework\Api\ImageContentValidator">
-        <plugin name="markshust_polyshell_validate_file_extension"
-                type="MarkShust\PolyshellPatch\Plugin\ImageContentValidatorExtension"/>
+        <plugin name="markshust_polyshellpatch_extension_validator"
+                type="MarkShust\PolyshellPatch\Plugin\ImageContentValidatorExtension"
+                sortOrder="10"/>
+        <plugin name="markshust_polyshellpatch_polyglot_validator"
+                type="MarkShust\PolyshellPatch\Plugin\ImageContentPolyglotValidator"
+                sortOrder="20"/>
     </type>
 </config>
