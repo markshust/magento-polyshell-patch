@@ -6,9 +6,8 @@ namespace MarkShust\PolyshellPatch\Plugin;
 
 use Magento\Framework\Api\Data\ImageContentInterface;
 use Magento\Framework\Api\ImageContentValidator;
-use Magento\Framework\Exception\InputException;
+use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Filesystem\Io\File as IoFile;
-use Magento\Framework\Phrase;
 
 /**
  * Validate that the uploaded filename has a safe image extension.
@@ -41,7 +40,7 @@ class ImageContentValidatorExtension
      * @param bool $result
      * @param ImageContentInterface $imageContent
      * @return bool
-     * @throws InputException
+     * @throws LocalizedException
      *
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
      */
@@ -55,8 +54,8 @@ class ImageContentValidatorExtension
         $extension = strtolower($pathInfo['extension'] ?? '');
 
         if ($extension && !in_array($extension, self::ALLOWED_EXTENSIONS, true)) {
-            throw new InputException(
-                new Phrase('The image file extension "%1" is not allowed.', [$extension])
+            throw new LocalizedException(
+                __('The image file extension "%1" is not allowed.', $extension)
             );
         }
 
